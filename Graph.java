@@ -1,6 +1,6 @@
 /******************************************************************
  *
- *   YOUR NAME / SECTION NUMBER
+ *   Dan Le - Section 1
  *
  *   Note, additional comments provided throughout this source code
  *   is for educational purposes
@@ -105,6 +105,18 @@ public class Graph {
   public int findRoot() {
 
     // ADD YOUR CODE HERE - DO NOT FORGET TO ADD YOUR NAME/SECTION AT TOP OF FILE
-    return -1;
+
+    List<Integer> vertices = new ArrayList<>(numVertices);
+    for (int i = 0; i < numVertices; i++) {
+      vertices.add(i);
+    }
+    for (LinkedList<Integer> edges : adjListArr) {
+      for (Integer vertex : edges) {
+        vertices.remove(vertex);
+      }
+    }
+
+    return vertices.size() == 1 ? vertexValues.get(vertices.getFirst()) : -1;
+
   } 
 }

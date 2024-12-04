@@ -1,6 +1,6 @@
 /******************************************************************
  *
- *   ADD YOUR NAME / SECTION NUMBER HERE
+ *   Dan Le - Section 1
  *
  *   This java file contains the problem solutions of canFinish and
  *   numGroups methods.
@@ -82,7 +82,38 @@ class ProblemSolutions {
                                         prerequisites); 
 
         // ADD YOUR CODE HERE - ADD YOUR NAME / SECTION AT TOP OF FILE
-        return false;
+
+        int[] inDegree = new int[numExams];
+        Arrays.fill(inDegree, 0);
+        for (ArrayList<Integer> v : adj) {
+            for (Integer i : v) {
+                inDegree[i]++;
+            }
+        }
+
+        Queue<Integer> box = new LinkedList<>();
+        List<Integer> visited = new ArrayList<>();
+        for (int i = 0; i < inDegree.length; i++) {
+            if (inDegree[i] == 0) {
+                box.add(i);
+            }
+        }
+
+        while (!box.isEmpty()) {
+
+            int vertex = box.remove();
+            visited.add(vertex);
+
+            for (Integer i : adj[vertex]) {
+                inDegree[i]--;
+                if (inDegree[i] == 0) {
+                    box.add(i);
+                }
+            }
+
+        }
+
+        return visited.size() == numNodes;
 
     }
 
@@ -164,35 +195,59 @@ class ProblemSolutions {
      */
 
     public int numGroups(int[][] adjMatrix) {
-        int numNodes = adjMatrix.length;
-        Map<Integer,List<Integer>> graph = new HashMap();
-        int i = 0, j =0;
 
-        /*
-         * Converting the Graph Adjacency Matrix to
-         * an Adjacency List representation. This
-         * sample code illustrates a technique to do so.
-         */
+        int n = adjMatrix.length;
+        int components = 0;
+        ArrayList<Integer>[] adj = getUndirectedAdjList(n, adjMatrix);
+        List<Integer> completedVertices = new ArrayList<>();
 
-        for(i = 0; i < numNodes ; i++){
-            for(j = 0; j < numNodes; j++){
-                if( adjMatrix[i][j] == 1 && i != j ){
-                    // Add AdjList for node i if not there
-                    graph.putIfAbsent(i, new ArrayList());
-                    // Add AdjList for node j if not there
-                    graph.putIfAbsent(j, new ArrayList());
+        for (int vertex = 0; vertex < n; vertex++) {
 
-                    // Update node i adjList to include node j
-                    graph.get(i).add(j);
-                    // Update node j adjList to include node i
-                    graph.get(j).add(i);
+            List<Integer> visitedVertices = new ArrayList<>();
+            if (!completedVertices.contains(vertex)) {
+
+                DFS(adj, vertex, visitedVertices);
+                completedVertices.addAll(visitedVertices);
+                components++;
+
+            }
+
+        }
+
+        return components;
+
+    }
+
+    private void DFS(ArrayList<Integer>[] adjacencyList, int vertex, List<Integer> visited) {
+        if (!visited.contains(vertex)) {
+            visited.add(vertex);
+            for (Integer adjacent : adjacencyList[vertex]) {
+                DFS(adjacencyList, adjacent, visited);
+            }
+        }
+    }
+
+    private ArrayList<Integer>[] getUndirectedAdjList(int numNodes, int[][] adjMatrix) {
+
+        ArrayList<Integer>[] adj = new ArrayList[numNodes];
+
+        for (int vertex = 0; vertex < numNodes; vertex++) {
+            adj[vertex] = new ArrayList<Integer>();
+        }
+
+        for (int vertexI = 0; vertexI < numNodes; vertexI++) {
+            for (int vertexJ = 0; vertexJ < numNodes; vertexJ++) {
+                if (adjMatrix[vertexI][vertexJ] == 1) {
+                    if (!adj[vertexI].contains(vertexJ))
+                        adj[vertexI].add(vertexJ);
+                    if (!adj[vertexJ].contains(vertexI))
+                        adj[vertexJ].add(vertexI);
                 }
             }
         }
 
-        // YOUR CODE GOES HERE - you can add helper methods, you do not need
-        // to put all code in this method.
-        return -1;
+        return adj;
+
     }
 
 }
